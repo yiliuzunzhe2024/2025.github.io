@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRRK综合管理系统</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* 选项卡容器 - 直接作为页面主体 */
+        .tab-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* 选项卡标题栏 - 简洁版 */
+        .tabs-header {
+            background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+            padding: 15px 20px;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .tabs-header h2 {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e0e6ed;
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .tab:hover {
+            background-color: #eef2f7;
+            color: #475569;
+        }
+        
+        .tab.active {
+            color: #1d4ed8;
+            border-bottom-color: #1d4ed8;
+            background-color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 价格查询系统样式 */
+        #price-system {
+            padding: 20px;
+        }
+        
+        #price-system .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        #price-system h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+        
+        #price-system .search-box {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        #price-system #search-input {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        #price-system .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        #price-system button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        #price-system button:hover {
+            background-color: #45a049;
+        }
+        
+        #price-system button.secondary {
+            background-color: #2196F3;
+        }
+        
+        #price-system button.danger {
+            background-color: #f44336;
+        }
+        
+        #price-system .results-info {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        #price-system .results-container {
+            margin-top: 20px;
+        }
+        
+        #price-system .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        #price-system .result-item:hover {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        
+        #price-system .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1a73e8;
+            font-size: 16px;
+        }
+        
+        #price-system .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        #price-system .detail-item {
+            font-size: 14px;
+        }
+        
+        #price-system .detail-label {
+            font-weight: bold;
+            color: #555;
+            margin-right: 5px;
+        }
+        
+        #price-system .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 16px;
+        }
+        
+        #price-system .price-highlight {
+            color: #e53935;
+            font-weight: bold;
+        }
+        
+        #price-system .quantity-input {
+            width: 50px;
+            padding: 3px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        
+        #price-system .total-amount {
+            font-weight: bold;
+            color: #e53935;
+            margin-left: 5px;
+        }
+        
+        /* 订单提取工具样式 - 修复版 */
+        #order-extractor {
+            padding: 20px;
+        }
+        
+        #order-extractor .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            min-height: 550px;
+        }
+        
+        @media (max-width: 900px) {
+            #order-extractor .content {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+        }
+        
+        #order-extractor .section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        #order-extractor h2 {
+            font-size: 18px;
+            color: #1e40af;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e7ff;
+        }
+        
+        #order-extractor textarea {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #dbeafe;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            transition: all 0.3s;
+            min-height: 350px;
+        }
+        
+        #order-extractor textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        #order-extractor .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        #order-extractor button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        #order-extractor .process-btn {
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            flex: 1;
+        }
+        
+        #order-extractor .process-btn:hover {
+            background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+        
+        #order-extractor .secondary-btn {
+            background: #eff6ff;
+            color: #3b82f6;
+            border: 1px solid #bfdbfe;
+        }
+        
+        #order-extractor .secondary-btn:hover {
+            background: #dbeafe;
+        }
+        
+        #order-extractor .result-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        #order-extractor .copy-btn {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            color: white;
+            flex: 1;
+        }
+        
+        #order-extractor .copy-btn:hover {
+            background: linear-gradient(90deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        #order-extractor .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        #order-extractor .stat-item {
+            text-align: center;
+        }
+        
+        #order-extractor .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1d4ed8;
+        }
+        
+        #order-extractor .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 3px;
+        }
+        
+        #order-extractor .example-btn {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+        
+        #order-extractor .example-btn:hover {
+            background: #bfdbfe;
+        }
+        
+        /* 价格转换器样式 */
+        #price-converter {
+            padding: 20px;
+        }
+        
+        #price-converter h2 {
+            font-size: 18px;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+        
+        #price-converter .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 6px;
+            padding: 25px 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #f8fafc;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        #price-converter .upload-area:hover {
+            background-color: #eef5ff;
+            border-color: #2980b9;
+        }
+        
+        #price-converter .upload-area.dragover {
+            background-color: #e1f0ff;
+            border-color: #1abc9c;
+        }
+        
+        #price-converter .upload-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        #price-converter .upload-hint {
+            color: #7f8c8d;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        
+        #price-converter .file-input {
+            margin: 0 auto 8px;
+            display: block;
+        }
+        
+        #price-converter .button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 4px;
+        }
+        
+        #price-converter .button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(41, 128, 185, 0.3);
+        }
+        
+        #price-converter .button-success {
+            background-color: #2ecc71;
+        }
+        
+        #price-converter .button-success:hover {
+            background-color: #27ae60;
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+        
+        #price-converter .result-area {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        #price-converter .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        #price-converter .result-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        #price-converter .result-count {
+            background-color: #3498db;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        #price-converter .result-container {
+            border: 1px solid #e0e6ed;
+            border-radius: 4px;
+            padding: 12px;
+            background-color: #f8fafc;
+            max-height: 350px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.3;
+            font-size: 12px;
+        }
+        
+        /* 模态框和通知通用样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            font-size: 18px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            font-family: monospace;
+        }
+        
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1001;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .notification.error {
+            background-color: #f44336;
+        }
+        
+        .notification.warning {
+            background-color: #ff9800;
+        }
+        
+        /* 返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background-color: #45a049;
+            transform: translateY(-3px);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .tab-container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            #price-system .button-group {
+                flex-direction: column;
+            }
+            
+            #price-system button {
+                width: 100%;
+            }
+            
+            #order-extractor .content {
+                min-height: auto;
+            }
+            
+            #order-extractor textarea {
+                min-height: 250px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- 直接使用选项卡容器，没有单独的标题栏 -->
+    <div class="tab-container">
+        <!-- 简洁的选项卡标题 -->
+        <div class="tabs-header">
+            <h2><i class="fas fa-cogs"></i> FRRK综合管理系统</h2>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="price-system">价格查询系统</button>
+            <button class="tab" data-tab="order-extractor">订单信息提取</button>
+            <button class="tab" data-tab="price-converter">价格表格转换</button>
+        </div>
+        
+        <!-- 价格查询系统 -->
+        <div id="price-system" class="tab-content active">
+            <div class="container">
+                <h1>FRRK系列产品价格查询系统</h1>
+                
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="输入产品编号或关键词进行查询..." autofocus>
+                    <button id="search-button">搜索</button>
+                </div>
+                
+                <div class="button-group">
+                    <button id="add-data-button">添加数据</button>
+                    <button id="import-data-button" class="secondary">导入数据</button>
+                    <button id="export-data-button" class="secondary">导出数据</button>
+                    <button id="reset-data-button" class="danger">重置数据</button>
+                </div>
+                
+                <div class="results-info" id="results-info"></div>
+                
+                <div class="results-container" id="results-container">
+                    <div class="no-results">请输入查询条件并点击搜索</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 订单信息提取工具 -->
+        <div id="order-extractor" class="tab-content">
+            <div class="container">
+                <h2><i class="fas fa-file-alt"></i> 电商订单信息提取工具</h2>
+                <div class="content">
+                    <div class="section">
+                        <h3>原始订单文本</h3>
+                        <textarea id="inputText" class="input-area" placeholder="请粘贴电商平台订单信息..."></textarea>
+                        
+                        <div class="controls">
+                            <button class="process-btn" onclick="processOrder()">
+                                <i class="fas fa-cogs"></i> 提取商品信息
+                            </button>
+                            <button class="secondary-btn" onclick="pasteFromClipboard()">
+                                <i class="fas fa-paste"></i> 从剪贴板粘贴
+                            </button>
+                            <button class="secondary-btn" onclick="clearAll()">
+                                <i class="fas fa-eraser"></i> 清空
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 12px;">
+                            <h4><i class="fas fa-vial"></i> 测试示例</h4>
+                            <button class="example-btn" onclick="loadExample()">加载示例订单</button>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3>提取结果</h3>
+                        <textarea id="outputText" class="output-area" placeholder="提取结果将显示在这里..." readonly></textarea>
+                        
+                        <div class="result-controls">
+                            <button class="copy-btn" onclick="copyResult()">
+                                <i class="fas fa-copy"></i> 复制结果
+                            </button>
+                            <button class="secondary-btn" onclick="downloadResult()">
+                                <i class="fas fa-download"></i> 下载为TXT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 价格表格转换器 -->
+        <div id="price-converter" class="tab-content">
+            <div class="container">
+                <h2><i class="fas fa-exchange-alt"></i> 价格表格转换器</h2>
+                <p>上传Excel价格表格，自动转换为JSON格式并下载</p>
+                
+                <div class="upload-area" id="uploadArea">
+                    <label class="upload-label">上传Excel文件</label>
+                    <p class="upload-hint">将文件拖放到此区域，或点击"选择文件"按钮</p>
+                    <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls">
+                    <button id="processBtn" class="button" disabled>处理文件</button>
+                </div>
+                
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>正在处理文件，请稍候...</p>
+                </div>
+                
+                <div class="error" id="error" style="display: none;">
+                    <p id="errorMessage"></p>
+                </div>
+                
+                <div class="result-area" id="resultArea">
+                    <div class="result-header">
+                        <div class="result-title">转换结果</div>
+                        <div class="result-count" id="resultCount">0 条记录</div>
+                    </div>
+                    <button id="downloadBtn" class="button button-success">下载TXT文件</button>
+                    <div class="result-container" id="resultContainer">
+                        <!-- 转换后的内容将显示在这里 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 价格查询系统的模态框 -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- 添加数据表单 -->
+    <div class="modal" id="dataModal">
+        <h2 id="modalTitle">添加新产品数据</h2>
+        
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="single">单条添加</button>
+            <button class="tab-button" data-tab="batch">批量添加</button>
+        </div>
+        
+        <div class="tab-content active" id="single-tab">
+            <div class="form-group">
+                <label for="product-id">产品编号:</label>
+                <input type="text" id="product-id" placeholder="例如: FRRK-03 圆环">
+            </div>
+            <div class="form-group">
+                <label for="price-3">三档价:</label>
+                <input type="number" id="price-3" placeholder="例如: 71" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="price-98">三档98折:</label>
+                <input type="number" id="price-98" placeholder="例如: 69.58" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="price-97">三档97折:</label>
+                <input type="number" id="price-97" placeholder="例如: 68.87" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="price-96">三档96折:</label>
+                <input type="number" id="price-96" placeholder="例如: 68.16" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="price-95">三档95折:</label>
+                <input type="number" id="price-95" placeholder="例如: 67.45" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="price-94">三档94折:</label>
+                <input type="number" id="price-94" placeholder="例如: 66.74" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="price-93">三档93折:</label>
+                <input type="number" id="price-93" placeholder="例如: 66.03" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="cost">成本:</label>
+                <input type="number" id="cost" placeholder="例如: 43" step="0.01">
+            </div>
+            <div class="form-buttons">
+                <button id="paste-data-button" class="secondary">从剪贴板粘贴</button>
+                <button id="cancel-add">取消</button>
+                <button id="submit-add">提交</button>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="batch-tab">
+            <div class="form-group">
+                <label for="batch-data">批量数据 (JSON格式):</label>
+                <textarea id="batch-data" placeholder='例如: [{"编号":"产品1", "三档价":100, ...}, {"编号":"产品2", "三档价":200, ...}]'></textarea>
+            </div>
+            <div class="form-buttons">
+                <button id="paste-batch-button" class="secondary">从剪贴板粘贴</button>
+                <button id="cancel-batch">取消</button>
+                <button id="submit-batch">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入数据表单 -->
+    <div class="modal" id="importModal">
+        <h2>导入数据</h2>
+        <div class="form-group">
+            <label for="import-data">粘贴JSON数据:</label>
+            <textarea id="import-data" placeholder='粘贴完整的JSON数据...'></textarea>
+        </div>
+        <div class="form-buttons">
+            <button id="cancel-import">取消</button>
+            <button id="confirm-import">导入</button>
+        </div>
+    </div>
+
+    <!-- 导出数据表单 -->
+    <div class="modal" id="exportModal">
+        <h2>导出数据</h2>
+        <div class="form-group">
+            <label for="export-data">当前所有数据 (JSON格式):</label>
+            <textarea id="export-data" readonly></textarea>
+        </div>
+        <div class="form-buttons">
+            <button id="copy-export">复制到剪贴板</button>
+            <button id="close-export">关闭</button>
+        </div>
+    </div>
+
+    <!-- 确认重置对话框 -->
+    <div class="modal" id="confirmResetModal">
+        <h2>确认重置数据</h2>
+        <p>您确定要重置所有数据吗？此操作无法撤销！</p>
+        <div class="form-buttons">
+            <button id="cancel-reset">取消</button>
+            <button id="confirm-reset" class="danger">确认重置</button>
+        </div>
+    </div>
+
+    <!-- 通知消息 -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="backToTop" title="返回顶部">↑</button>
+    
+    <footer>
+        <p>FRRK综合管理系统 v1.0 | 数据本地处理，安全可靠</p>
+    </footer>
+
+    <!-- 引入SheetJS库用于处理Excel文件 -->
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    
+    <script>
+        // ==================== 全局变量和通用函数 ====================
+        let productData = []; // 价格查询系统的数据
+        let currentTab = 'price-system'; // 当前选中的标签页
+        
+        // 切换标签页
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // 更新标签按钮状态
+                document.querySelectorAll('.tab').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // 更新标签内容
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+                
+                currentTab = tabId;
+                
+                // 如果是价格查询系统，初始化数据
+                if (tabId === 'price-system') {
+                    initPriceSystem();
+                }
+            });
+        });
+        
+        // 显示通知
+        function showNotification(message, type = 'success', duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification';
+            
+            if (type === 'error') {
+                notification.classList.add('error');
+            } else if (type === 'warning') {
+                notification.classList.add('warning');
+            }
+            
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, duration);
+        }
+        
+        // 显示模态框
+        function showModal(modalId) {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById(modalId).style.display = 'block';
+        }
+        
+        // 隐藏所有模态框
+        function hideAllModals() {
+            document.getElementById('overlay').style.display = 'none';
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        // 返回顶部按钮
+        window.addEventListener('scroll', function() {
+            const backToTop = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+        
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // ==================== 价格查询系统功能 ====================
+        function initPriceSystem() {
+            // 初始化产品数据 - 先从本地存储加载，如果没有则使用默认数据
+            productData = loadDataFromLocalStorage() || [
+                
+            ];
+            
+            // 搜索功能
+            document.getElementById('search-button').addEventListener('click', performSearch);
+            document.getElementById('search-input').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // 添加数据按钮点击事件
+            document.getElementById('add-data-button').addEventListener('click', function() {
+                showModal('dataModal');
+            });
+            
+            // 导入数据按钮点击事件
+            document.getElementById('import-data-button').addEventListener('click', function() {
+                showModal('importModal');
+            });
+            
+            // 导出数据按钮点击事件
+            document.getElementById('export-data-button').addEventListener('click', function() {
+                document.getElementById('export-data').value = JSON.stringify(productData, null, 2);
+                showModal('exportModal');
+            });
+            
+            // 重置数据按钮点击事件
+            document.getElementById('reset-data-button').addEventListener('click', function() {
+                showModal('confirmResetModal');
+            });
+            
+            // 标签切换功能（添加数据模态框内的标签）
+            document.querySelectorAll('#dataModal .tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // 更新标签按钮状态
+                    document.querySelectorAll('#dataModal .tab-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // 更新标签内容
+                    document.querySelectorAll('#dataModal .tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // 提交添加数据表单
+            document.getElementById('submit-add').addEventListener('click', function() {
+                const productId = document.getElementById('product-id').value.trim();
+                const price3 = document.getElementById('price-3').value.trim();
+                const price98 = document.getElementById('price-98').value.trim();
+                const price97 = document.getElementById('price-97').value.trim();
+                const price96 = document.getElementById('price-96').value.trim();
+                const price95 = document.getElementById('price-95').value.trim();
+                const price94 = document.getElementById('price-94').value.trim();
+                const price93 = document.getElementById('price-93').value.trim();
+                const cost = document.getElementById('cost').value.trim();
+                
+                if (!productId) {
+                    showNotification('请输入产品编号');
+                    return;
+                }
+                
+                const newProduct = {
+                    "编号": productId,
+                    "三档价": price3 || "0",
+                    "三档98折": price98 || "0",
+                    "三档97折": price97 || "0",
+                    "三档96折": price96 || "0",
+                    "三档95折": price95 || "0",
+                    "三档94折": price94 || "0",
+                    "三档93折": price93 || "0",
+                    "成本": cost || "0"
+                };
+                
+                productData.push(newProduct);
+                saveDataToLocalStorage(productData);
+                showNotification('产品添加成功');
+                hideAllModals();
+                performSearch();
+                
+                // 清空表单
+                document.getElementById('product-id').value = '';
+                document.getElementById('price-3').value = '';
+                document.getElementById('price-98').value = '';
+                document.getElementById('price-97').value = '';
+                document.getElementById('price-96').value = '';
+                document.getElementById('price-95').value = '';
+                document.getElementById('price-94').value = '';
+                document.getElementById('price-93').value = '';
+                document.getElementById('cost').value = '';
+            });
+            
+            // 提交批量添加表单
+            document.getElementById('submit-batch').addEventListener('click', function() {
+                const batchDataText = document.getElementById('batch-data').value.trim();
+                
+                if (!batchDataText) {
+                    showNotification('请输入批量数据');
+                    return;
+                }
+                
+                try {
+                    const batchData = JSON.parse(batchDataText);
+                    if (!Array.isArray(batchData)) {
+                        showNotification('数据格式不正确，应为数组');
+                        return;
+                    }
+                    
+                    productData = productData.concat(batchData);
+                    saveDataToLocalStorage(productData);
+                    showNotification(`成功添加 ${batchData.length} 条产品数据`);
+                    hideAllModals();
+                    performSearch();
+                    
+                    // 清空表单
+                    document.getElementById('batch-data').value = '';
+                } catch (e) {
+                    showNotification('JSON格式错误: ' + e.message);
+                }
+            });
+            
+            // 从剪贴板粘贴数据
+            document.getElementById('paste-data-button').addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    const lines = text.split('\n');
+                    if (lines.length >= 9) {
+                        document.getElementById('product-id').value = lines[0].trim();
+                        document.getElementById('price-3').value = lines[1].trim();
+                        document.getElementById('price-98').value = lines[2].trim();
+                        document.getElementById('price-97').value = lines[3].trim();
+                        document.getElementById('price-96').value = lines[4].trim();
+                        document.getElementById('price-95').value = lines[5].trim();
+                        document.getElementById('price-94').value = lines[6].trim();
+                        document.getElementById('price-93').value = lines[7].trim();
+                        document.getElementById('cost').value = lines[8].trim();
+                        showNotification('数据已从剪贴板粘贴');
+                    } else {
+                        showNotification('剪贴板数据格式不正确');
+                    }
+                } catch (err) {
+                    showNotification('无法访问剪贴板: ' + err.message);
+                }
+            });
+            
+            // 从剪贴板粘贴批量数据
+            document.getElementById('paste-batch-button').addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    document.getElementById('batch-data').value = text;
+                    showNotification('批量数据已从剪贴板粘贴');
+                } catch (err) {
+                    showNotification('无法访问剪贴板: ' + err.message);
+                }
+            });
+            
+            // 确认导入数据
+            document.getElementById('confirm-import').addEventListener('click', function() {
+                const importDataText = document.getElementById('import-data').value.trim();
+                
+                if (!importDataText) {
+                    showNotification('请输入要导入的数据');
+                    return;
+                }
+                
+                try {
+                    const importedData = JSON.parse(importDataText);
+                    if (!Array.isArray(importedData)) {
+                        showNotification('数据格式不正确，应为数组');
+                        return;
+                    }
+                    
+                    productData = importedData;
+                    saveDataToLocalStorage(productData);
+                    showNotification(`成功导入 ${importedData.length} 条产品数据`);
+                    hideAllModals();
+                    performSearch();
+                    
+                    // 清空表单
+                    document.getElementById('import-data').value = '';
+                } catch (e) {
+                    showNotification('JSON格式错误: ' + e.message);
+                }
+            });
+            
+            // 复制导出数据
+            document.getElementById('copy-export').addEventListener('click', function() {
+                const exportData = document.getElementById('export-data');
+                exportData.select();
+                document.execCommand('copy');
+                showNotification('数据已复制到剪贴板');
+            });
+            
+            // 确认重置数据
+            document.getElementById('confirm-reset').addEventListener('click', function() {
+                productData = [
+                   
+                ];
+                saveDataToLocalStorage(productData);
+                showNotification('数据已重置为默认值');
+                hideAllModals();
+                document.getElementById('search-input').value = '';
+                performSearch();
+            });
+            
+            // 取消按钮点击事件
+            document.getElementById('cancel-add').addEventListener('click', hideAllModals);
+            document.getElementById('cancel-batch').addEventListener('click', hideAllModals);
+            document.getElementById('cancel-import').addEventListener('click', hideAllModals);
+            document.getElementById('close-export').addEventListener('click', hideAllModals);
+            document.getElementById('cancel-reset').addEventListener('click', hideAllModals);
+            
+            // 覆盖层点击事件
+            document.getElementById('overlay').addEventListener('click', hideAllModals);
+            
+            // 初始化页面
+            performSearch();
+        }
+        
+        // 加载本地存储数据
+        function loadDataFromLocalStorage() {
+            const data = localStorage.getItem('productData');
+            return data ? JSON.parse(data) : null;
+        }
+        
+        // 保存数据到本地存储
+        function saveDataToLocalStorage(data) {
+            localStorage.setItem('productData', JSON.stringify(data));
+        }
+        
+        // 搜索功能
+        function performSearch() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const resultsContainer = document.getElementById('results-container');
+            const resultsInfo = document.getElementById('results-info');
+            
+            if (!searchTerm) {
+                resultsContainer.innerHTML = '<div class="no-results">请输入查询条件并点击搜索</div>';
+                resultsInfo.textContent = '';
+                return;
+            }
+            
+            const filteredProducts = productData.filter(product => 
+                product.编号.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredProducts.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">没有找到匹配的产品</div>';
+                resultsInfo.textContent = `找到 0 个结果`;
+                return;
+            }
+            
+            resultsInfo.textContent = `找到 ${filteredProducts.length} 个结果`;
+            
+            let html = '';
+            filteredProducts.forEach(product => {
+                html += `
+                    <div class="result-item">
+                        <div class="result-title">${product.编号}</div>
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <span class="detail-label">三档价:</span>
+                                <span class="price-highlight">${product.三档价}</span>
+                                <input type="number" class="quantity-input" data-price="${product.三档价}" placeholder="数量" min="1" value="1">
+                                <span class="total-amount">${product.三档价}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">三档98折:</span>
+                                <span class="price-highlight">${product.三档98折}</span>
+                                <input type="number" class="quantity-input" data-price="${product.三档98折}" placeholder="数量" min="1" value="1">
+                                <span class="total-amount">${product.三档98折}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">三档97折:</span>
+                                <span class="price-highlight">${product.三档97折 || '0.00'}</span>
+                                <input type="number" class="quantity-input" data-price="${product.三档97折 || '0.00'}" placeholder="数量" min="1" value="1">
+                                <span class="total-amount">${product.三档97折 || '0.00'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">三档96折:</span>
+                                <span class="price-highlight">${product.三档96折 || '0.00'}</span>
+                                <input type="number" class="quantity-input" data-price="${product.三档96折 || '0.00'}" placeholder="数量" min="1" value="1">
+                                <span class="total-amount">${product.三档96折 || '0.00'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">三档95折:</span>
+                                <span class="price-highlight">${product.三档95折 || product['三档 95折'] || '0.00'}</span>
+                                <input type="number" class="quantity-input" data-price="${product.三档95折 || product['三档 95折'] || '0.00'}" placeholder="数量" min="1" value="1">
+                                <span class="total-amount">${product.三档95折 || product['三档 95折'] || '0.00'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">三档94折:</span>
+                                <span class="price-highlight">${product.三档94折 || product['三档 94折'] || '0.00'}</span>
+                                <input type="number" class="quantity-input" data-price="${product.三档94折 || product['三档 94折'] || '0.00'}" placeholder="数量" min="1" value="1">
+                                <span class="total-amount">${product.三档94折 || product['三档 94折'] || '0.00'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">三档93折:</span>
+                                <span class="price-highlight">${product.三档93折 || product['三档 93折'] || '0.00'}</span>
+                                <input type="number" class="quantity-input" data-price="${product.三档93折 || product['三档 93折'] || '0.00'}" placeholder="数量" min="1" value="1">
+                                <span class="total-amount">${product.三档93折 || product['三档 93折'] || '0.00'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">成本:</span>
+                                <span class="price-highlight">${product.成本}</span>
+                                <input type="number" class="quantity-input" data-price="${product.成本}" placeholder="数量" min="1" value="1">
+                                <span class="total-amount">${product.成本}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+            
+            // 添加数量输入框的事件监听
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const price = parseFloat(this.getAttribute('data-price'));
+                    const quantity = parseInt(this.value) || 0;
+                    const total = (price * quantity).toFixed(2);
+                    this.nextElementSibling.textContent = total;
+                });
+            });
+        }
+        
+        // ==================== 订单信息提取工具功能 ====================
+        // 示例数据
+        const exampleOrder = `订单信息 
+订单号： 3119954451787008785
+收货人： 美登(168)
+收货地址： 河南省 南阳市 宛城区 枣林街道 长江路大梁庄万家乐园附近50米。发和图片一样的，缺货请及时告知，
+手机： 17698839827
+电话：
+发货时间： 付款后2~3天内发货 查看详情 >
+买家信息
+买家：
+会员登录名： 情调路总 
+货品
+单价（元）
+数量
+优惠（元）
+货品状态
+
+FRRK-122 扁 阴茎环阴茎锻炼阴茎笼不锈钢训练贞操锁成人情趣男用
+规格: FRRK-122 【内径35mm】弧环50mm
+货号: FRRK-122 【内径35mm】弧环50mm
+7天无理由退货 极速退款 48小时发货 跨境无忧 退货包运费
+48.00 元/个
+1
+会员价： 省2.40
+卖家修改： 减3.60元
+
+FRRK-150 弧环负极数锁阴茎笼挑战猎涩成人情趣男用贞操锁贞洁器
+规格: FRRK-150 弧环55mm
+货号: FRRK-150 弧环55mm
+7天无理由退货 极速退款 48小时发货 跨境无忧 退货包运费
+81.00 元/个
+1
+会员价： 省4.05
+卖家修改： 减1.95元
+
+FRRK-151CD 穿戴尿道塞负数锁负极不锈钢贞操锁狼牙男用成人玩具
+规格: FRRK-151 卡环45mm+皮带
+货号: FRRK-151 卡环45mm+皮带
+7天无理由退货 极速退款 48小时发货 跨境无忧 退货包运费
+85.00 元/个
+1
+会员价： 省4.25
+
+FRRK-402 DIY负极数锁阴茎笼挑战猎涩成人男用锻炼贞操锁贞洁器
+规格: 圆环45mm+全套配件
+货号: FRRK-402 圆环45mm
+7天无理由退货 72小时发货 极速退款 跨境无忧 退货包运费
+99.00 元/个
+1
+会员价： 省4.95
+卖家修改： 减1.05元
+
+FRRK-217 3D一体成型彩色负数鱼篓贞操锁贞洁器CB锁阴茎束缚鸟笼
+规格: [217#粉色]：含四环及配件
+货号: FRRK-217 粉色
+7天无理由退货 极速退款 48小时发货 跨境无忧 退货包运费
+70.00 元/个
+1
+会员价： 省3.50`;
+        
+        // 加载示例
+        function loadExample() {
+            document.getElementById('inputText').value = exampleOrder;
+            showNotification('示例订单已加载', 'success');
+        }
+        
+        // 从剪贴板粘贴
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('inputText').value = text;
+                showNotification('已从剪贴板粘贴', 'success');
+            } catch (err) {
+                showNotification('无法访问剪贴板，请手动粘贴', 'error');
+            }
+        }
+        
+        // 清空所有
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('totalItems').textContent = '0';
+            document.getElementById('totalQuantity').textContent = '0';
+            document.getElementById('processTime').textContent = '0';
+            showNotification('已清空', 'success');
+        }
+        
+        // 主处理函数：提取订单信息
+        function processOrder() {
+            const startTime = performance.now();
+            const inputText = document.getElementById('inputText').value;
+            
+            if (!inputText.trim()) {
+                showNotification('请输入订单文本', 'error');
+                return;
+            }
+            
+            const lines = inputText.split(/\r?\n/);
+            const result = [];
+            const items = [];
+            
+            // 先提取订单基本信息
+            let orderInfo = [];
+            let inProductSection = false;
+            let currentProduct = null;
+            let skipNextLines = 0;
+            
+            for (let i = 0; i < lines.length; i++) {
+                // 跳过已处理的空行
+                if (skipNextLines > 0) {
+                    skipNextLines--;
+                    continue;
+                }
+                
+                const line = lines[i].trim();
+                
+                // 提取订单基本信息（前几行）
+                if (i < 10) {
+                    if (line.startsWith('订单号：') || line.startsWith('收货人：') || 
+                        line.startsWith('收货地址：') || line.startsWith('手机：')) {
+                        orderInfo.push(line);
+                        continue;
+                    }
+                }
+                
+                // 跳过买家信息等无关行
+                if (line.startsWith('买家：') || line.startsWith('会员登录名：') || 
+                    line.includes('货品') || line.includes('单价') || 
+                    line.includes('货品状态') || line.includes('买家信息') ||
+                    line === '' || line.includes('订单信息')) {
+                    continue;
+                }
+                
+                // 检测商品标题行（包含FRRK-但不包含"规格:"或"货号:"）
+                if ((line.includes('FRRK-') || line.includes('K-') || line.includes('PU-')) && 
+                    !line.includes('规格:') && !line.includes('货号:')) {
+                    
+                    // 如果上一商品还未处理完，先处理
+                    if (currentProduct && currentProduct.spec && currentProduct.quantity) {
+                        items.push({
+                            spec: formatProductSpec(currentProduct.spec),
+                            quantity: currentProduct.quantity
+                        });
+                    }
+                    
+                    currentProduct = { 
+                        name: line,
+                        spec: '',
+                        quantity: 0
+                    };
+                    inProductSection = true;
+                    continue;
+                }
+                
+                // 在商品区块内提取信息
+                if (inProductSection && currentProduct) {
+                    // 提取规格
+                    if (line.startsWith('规格:')) {
+                        currentProduct.spec = line.replace('规格:', '').trim();
+                        continue;
+                    }
+                    
+                    // 提取货号（可能包含更准确的规格）
+                    if (line.startsWith('货号:')) {
+                        const productCode = line.replace('货号:', '').trim();
+                        // 如果货号信息更详细，使用货号作为规格
+                        if (productCode && productCode !== currentProduct.spec) {
+                            currentProduct.spec = productCode;
+                        }
+                        continue;
+                    }
+                    
+                    // 查找数量行（价格行后面的数字）
+                    // 价格行模式：数字.数字 元/个
+                    if (/^\d+(\.\d+)?\s+元/.test(line)) {
+                        // 向后查找数量
+                        for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
+                            const nextLine = lines[j].trim();
+                            // 数量是纯数字
+                            if (/^\d+$/.test(nextLine)) {
+                                currentProduct.quantity = parseInt(nextLine);
+                                
+                                // 确定最终的显示文本
+                                let displaySpec = currentProduct.spec;
+                                
+                                // 如果规格为空但有商品名，从商品名中提取信息
+                                if (!displaySpec && currentProduct.name) {
+                                    // 尝试从商品名中提取关键部分
+                                    const nameParts = currentProduct.name.split(' ');
+                                    if (nameParts.length > 1) {
+                                        // 跳过编码部分，取描述部分
+                                        displaySpec = nameParts.slice(1).join(' ').trim();
+                                    }
+                                }
+                                
+                                // 如果还是没有规格，使用商品名
+                                if (!displaySpec) {
+                                    displaySpec = currentProduct.name;
+                                }
+                                
+                                // 格式化规格（移除重复编码）
+                                displaySpec = formatProductSpec(displaySpec);
+                                
+                                // 保存商品信息
+                                if (displaySpec && currentProduct.quantity > 0) {
+                                    items.push({
+                                        spec: displaySpec,
+                                        quantity: currentProduct.quantity
+                                    });
+                                }
+                                
+                                // 跳过已处理的几行
+                                skipNextLines = j - i;
+                                break;
+                            }
+                        }
+                        
+                        // 重置商品状态
+                        currentProduct = null;
+                        inProductSection = false;
+                    }
+                }
+            }
+            
+            // 处理最后一个商品
+            if (currentProduct && currentProduct.spec && currentProduct.quantity) {
+                items.push({
+                    spec: formatProductSpec(currentProduct.spec),
+                    quantity: currentProduct.quantity
+                });
+            }
+            
+            // 构建结果文本
+            // 1. 添加订单基本信息
+            if (orderInfo.length > 0) {
+                result.push(...orderInfo);
+                result.push(''); // 空行分隔
+            }
+            
+            // 2. 添加商品清单
+            let totalQuantity = 0;
+            items.forEach(item => {
+                const displayText = `${item.spec} *${item.quantity}`;
+                result.push(displayText);
+                totalQuantity += item.quantity;
+            });
+            
+            // 3. 添加总数量统计
+            if (items.length > 0) {
+                result.push('');
+                result.push('s11'); // 固定显示 s11
+            }
+            
+            // 显示结果
+            const outputText = result.join('\n');
+            document.getElementById('outputText').value = outputText;
+            
+            // 更新统计信息
+            const endTime = performance.now();
+            document.getElementById('totalItems').textContent = items.length;
+            document.getElementById('totalQuantity').textContent = totalQuantity;
+            document.getElementById('processTime').textContent = Math.round(endTime - startTime);
+            
+            // 显示通知
+            if (items.length > 0) {
+                showNotification(`成功提取 ${items.length} 种商品，总计 ${totalQuantity} 件`, 'success');
+            } else {
+                showNotification('未找到商品信息，请检查格式', 'warning');
+            }
+        }
+        
+        // 格式化商品规格（移除重复编码）
+        function formatProductSpec(spec) {
+            if (!spec) return '';
+            
+            // 匹配商品编码模式
+            const codePattern = /^(FRRK-\d+[A-Z]?|K-\d+|PU-\d+)\s+/i;
+            const match = spec.match(codePattern);
+            
+            if (match) {
+                const code = match[1];
+                // 检查规格中是否重复包含该编码
+                const codeRegex = new RegExp(`^${code}\\s+${code}`, 'i');
+                if (codeRegex.test(spec)) {
+                    // 移除重复的编码
+                    return spec.replace(new RegExp(`^${code}\\s+`, 'i'), '');
+                }
+            }
+            
+            return spec;
+        }
+        
+        // 复制结果
+        function copyResult() {
+            const outputText = document.getElementById('outputText').value;
+            if (!outputText.trim()) {
+                showNotification('没有内容可复制', 'error');
+                return;
+            }
+            
+            navigator.clipboard.writeText(outputText)
+                .then(() => showNotification('结果已复制到剪贴板', 'success'))
+                .catch(err => {
+                    showNotification('复制失败，请手动选择复制', 'error');
+                });
+        }
+        
+        // 下载结果
+        function downloadResult() {
+            const outputText = document.getElementById('outputText').value;
+            if (!outputText.trim()) {
+                showNotification('没有内容可下载', 'error');
+                return;
+            }
+            
+            const blob = new Blob([outputText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const date = new Date().toISOString().slice(0, 10);
+            a.download = `订单商品清单_${date}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('文件已开始下载', 'success');
+        }
+        
+        // ==================== 价格表格转换器功能 ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const processBtn = document.getElementById('processBtn');
+            const uploadArea = document.getElementById('uploadArea');
+            const resultArea = document.getElementById('resultArea');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultCount = document.getElementById('resultCount');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            let jsonData = [];
+            
+            // 文件选择事件
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    processBtn.disabled = false;
+                }
+            });
+            
+            // 拖放功能
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    processBtn.disabled = false;
+                }
+            });
+            
+            // 处理文件按钮点击事件
+            processBtn.addEventListener('click', function() {
+                if (fileInput.files.length === 0) {
+                    showError('请先选择一个文件');
+                    return;
+                }
+                
+                const file = fileInput.files[0];
+                
+                // 检查文件类型
+                if (!file.name.match(/\.(xlsx|xls)$/i)) {
+                    showError('请选择Excel文件（.xlsx或.xls格式）');
+                    return;
+                }
+                
+                // 显示加载动画
+                loading.style.display = 'block';
+                resultArea.style.display = 'none';
+                error.style.display = 'none';
+                
+                // 读取文件
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        
+                        // 假设数据在第一个工作表
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        
+                        // 将工作表转换为JSON
+                        const rawData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                        
+                        // 处理数据
+                        processExcelData(rawData);
+                        
+                        // 显示结果
+                        displayResults();
+                        
+                    } catch (err) {
+                        showError('处理文件时出错: ' + err.message);
+                    } finally {
+                        loading.style.display = 'none';
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showError('读取文件失败');
+                    loading.style.display = 'none';
+                };
+                
+                reader.readAsArrayBuffer(file);
+            });
+            
+            // 下载按钮点击事件
+            downloadBtn.addEventListener('click', function() {
+                if (jsonData.length === 0) {
+                    showError('没有数据可下载');
+                    return;
+                }
+                
+                // 创建TXT文件内容
+                let txtContent = '';
+                jsonData.forEach(item => {
+                    txtContent += JSON.stringify(item) + ',\n';
+                });
+                
+                // 创建下载链接
+                const blob = new Blob([txtContent], {type: 'text/plain'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'price_data.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showNotification('文件已开始下载', 'success');
+            });
+            
+            // 处理Excel数据
+            function processExcelData(data) {
+                jsonData = [];
+                
+                if (data.length < 2) {
+                    showError('表格数据不足');
+                    return;
+                }
+                
+                // 获取表头（第一行）
+                const headers = data[0];
+                
+                // 从第二行开始处理数据
+                for (let i = 1; i < data.length; i++) {
+                    const row = data[i];
+                    
+                    // 检查是否有必要的数据
+                    if (!row[0] || row[0].toString().trim() === '') {
+                        continue;
+                    }
+                    
+                    // 创建JSON对象
+                    const item = {
+                        "编号": row[0] ? row[0].toString().trim() : "",
+                        "三档价": row[1] ? formatNumber(row[1]) : "",
+                        "三档98折": row[2] ? formatNumber(row[2]) : "",
+                        "三档97折": row[3] ? formatNumber(row[3]) : "",
+                        "三档96折": row[4] ? formatNumber(row[4]) : "",
+                        "三档 95折": row[5] ? formatNumber(row[5]) : "",
+                        "三档 94折": row[6] ? formatNumber(row[6]) : "",
+                        "三档 93折": row[7] ? formatNumber(row[7]) : "",
+                        "成本": row[8] ? formatNumber(row[8]) : ""
+                    };
+                    
+                    jsonData.push(item);
+                }
+                
+                if (jsonData.length === 0) {
+                    showError('未能从表格中提取到有效数据');
+                }
+            }
+            
+            // 格式化数字，保留两位小数
+            function formatNumber(value) {
+                if (typeof value === 'string' && value.startsWith('=')) {
+                    // 如果是公式，尝试计算
+                    try {
+                        // 简单提取公式中的数字进行计算
+                        const match = value.match(/=B\d+\*0\.(\d+)/);
+                        if (match) {
+                            const rowNum = value.match(/B(\d+)/)[1];
+                            // 这里需要基础价格数据，但我们没有上下文
+                            // 所以返回原始公式字符串
+                            return value;
+                        }
+                    } catch (e) {
+                        // 如果解析失败，返回原始值
+                    }
+                }
+                
+                // 如果是数字，格式化为两位小数
+                const num = parseFloat(value);
+                if (!isNaN(num)) {
+                    return num.toFixed(2);
+                }
+                
+                // 否则返回原始字符串
+                return value.toString();
+            }
+            
+            // 显示处理结果
+            function displayResults() {
+                if (jsonData.length === 0) {
+                    showError('没有找到可转换的数据');
+                    return;
+                }
+                
+                // 更新结果计数
+                resultCount.textContent = `${jsonData.length} 条记录`;
+                
+                // 构建显示内容
+                let displayContent = '';
+                jsonData.forEach(item => {
+                    displayContent += JSON.stringify(item) + ',\n';
+                });
+                
+                // 显示结果
+                resultContainer.textContent = displayContent;
+                resultArea.style.display = 'block';
+                
+                // 滚动到结果区域
+                resultArea.scrollIntoView({behavior: 'smooth'});
+                showNotification(`成功转换 ${jsonData.length} 条记录`, 'success');
+            }
+            
+            // 显示错误信息
+            function showError(message) {
+                errorMessage.textContent = message;
+                error.style.display = 'block';
+                resultArea.style.display = 'none';
+                loading.style.display = 'none';
+                
+                // 滚动到错误信息
+                error.scrollIntoView({behavior: 'smooth'});
+                showNotification(message, 'error');
+            }
+        });
+        
+        // ==================== 页面初始化 ====================
+        // 初始化价格查询系统
+        initPriceSystem();
+        
+        // 添加键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+1,2,3 切换标签页
+            if (e.ctrlKey) {
+                if (e.key === '1') {
+                    e.preventDefault();
+                    document.querySelector('.tab[data-tab="price-system"]').click();
+                } else if (e.key === '2') {
+                    e.preventDefault();
+                    document.querySelector('.tab[data-tab="order-extractor"]').click();
+                } else if (e.key === '3') {
+                    e.preventDefault();
+                    document.querySelector('.tab[data-tab="price-converter"]').click();
+                }
+            }
+            
+            // 在订单提取工具中，Ctrl+Enter 处理订单
+            if (currentTab === 'order-extractor' && e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                processOrder();
+            }
+            
+            // 在价格查询系统中，Ctrl+F 聚焦搜索框
+            if (currentTab === 'price-system' && e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('search-input').focus();
+            }
+        });
+        
+        // 页面加载完成显示通知
+        setTimeout(() => {
+            showNotification('FRRK综合管理系统已就绪！使用 Ctrl+1/2/3 快速切换功能', 'success', 5000);
+        }, 1000);
+    </script>
+</body>
+</html>
